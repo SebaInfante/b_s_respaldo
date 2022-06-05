@@ -1,0 +1,44 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const express_validator_1 = require("express-validator");
+const multer_1 = __importDefault(require("multer"));
+const storageStrategy = multer_1.default.memoryStorage();
+const bstorage = (0, multer_1.default)({ storage: storageStrategy });
+const person_1 = require("../controllers/person");
+const multer_2 = __importDefault(require("../lib/multer"));
+const validar_campos_1 = require("../middlewares/validar-campos");
+const validar_jwt_1 = require("../middlewares/validar-jwt");
+const validar_role_1 = require("../middlewares/validar-role");
+const router = (0, express_1.Router)();
+// router.get("/",                   [validarJWT], getPrincipal);
+router.get("/allEmployement", [validar_jwt_1.validarJWT, validar_role_1.esAdminRole], person_1.getAllEmployment);
+router.get("/person/:rut", [validar_jwt_1.validarJWT, (0, express_validator_1.check)("rut", "Rut is required").not().isEmpty(), validar_campos_1.validarCampos], person_1.getPerson);
+router.get("/fichaPerson/:rut", [validar_jwt_1.validarJWT, (0, express_validator_1.check)("rut", "Rut is required").not().isEmpty(), validar_campos_1.validarCampos], person_1.getFichaPerson);
+router.post("/persons", [validar_jwt_1.validarJWT], person_1.getPersons);
+router.post("/cantPersonas", [validar_jwt_1.validarJWT], person_1.cantPersonasTotales);
+router.post("/validarRut", [validar_jwt_1.validarJWT, (0, express_validator_1.check)("rut", "Rut is required").not().isEmpty(), validar_campos_1.validarCampos], person_1.validarRut);
+router.post("/employement", [validar_jwt_1.validarJWT, (0, express_validator_1.check)("empresa", "Empresa is required").not().isEmpty(), validar_campos_1.validarCampos], person_1.getEmployment);
+router.post("/documents", [validar_jwt_1.validarJWT, (0, express_validator_1.check)("ocupacion", "ocupacion is required").not().isEmpty(), validar_campos_1.validarCampos], person_1.getDocuments);
+router.post("/photoFile", [validar_jwt_1.validarJWT, bstorage.single("file")], person_1.photoFile);
+router.post("/photoPreview", [validar_jwt_1.validarJWT, bstorage.single("file")], person_1.photoPreview);
+router.post("/addPerson", [validar_jwt_1.validarJWT, (0, express_validator_1.check)("rut", "Rut is required").not().isEmpty(), (0, express_validator_1.check)("nombre", "Rut is required").not().isEmpty(), validar_campos_1.validarCampos], person_1.addPerson);
+router.post("/addPersonPhoto", [validar_jwt_1.validarJWT, (0, express_validator_1.check)("id_person", "id_person is required").not().isEmpty(), (0, express_validator_1.check)("id_resource_data", "id_resource_data is required").not().isEmpty(), validar_campos_1.validarCampos], person_1.addPersonPhoto);
+router.post("/addEmplyee", [validar_jwt_1.validarJWT], person_1.addEmplyee);
+router.post("/docsFile", [validar_jwt_1.validarJWT, multer_2.default.single("file")], person_1.docsFile);
+router.post("/documentsPerson", [validar_jwt_1.validarJWT], person_1.getDocumentsPerson);
+router.get("/downloadDoc/:resource_url", person_1.downloadDoc);
+router.put("/updateDatos/:person_id", [validar_jwt_1.validarJWT], person_1.updateDatos);
+// router.post("/downloadDoc",       [validarJWT], downloadDoc);
+router.delete("/deletePerson/:id", [validar_jwt_1.validarJWT], person_1.deletePerson);
+router.delete("/deleteFile/:id", [validar_jwt_1.validarJWT], person_1.deleteFile);
+router.post("/sendEmailDeletePerson", [validar_jwt_1.validarJWT], person_1.sendEmailDeletePerson);
+router.post('/report', person_1.downloadReportRecords);
+router.get('/downreport/:resource_url', person_1.downReport);
+router.get('/downloadFicha/:resource_url', person_1.downloadFicha);
+exports.default = router;
+// 
+//# sourceMappingURL=person.js.map
