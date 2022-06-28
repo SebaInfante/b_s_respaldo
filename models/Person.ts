@@ -4,11 +4,15 @@ import dbREG from "../db/connectionResgisters";
 const Person = dbREG.define<any>(
     "tdx_person",
     {
-        id: {
+        id_table: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement:true,
         allowNull:false
+        },
+        id: {
+        type: DataTypes.INTEGER,
+        allowNull:true
         },
         site_id: {
         type: DataTypes.INTEGER,
@@ -38,7 +42,7 @@ const Person = dbREG.define<any>(
         },
         create_time: {
         type: DataTypes.DATE,
-        allowNull:false
+        allowNull:true
         },
         update_time: {
         type: DataTypes.STRING,

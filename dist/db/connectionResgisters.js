@@ -9,6 +9,7 @@ const pass = process.env.BD_REG_PASSWORD || "";
 const db = new sequelize_1.Sequelize(name, user, pass, {
     host,
     port: 1433,
+    // dialect: "mysql",
     dialect: "mssql",
     logging: false,
     pool: {

@@ -6,11 +6,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const sequelize_1 = require("sequelize");
 const connectionResgisters_1 = __importDefault(require("../db/connectionResgisters"));
 const Employee = connectionResgisters_1.default.define("tdx_employee", {
-    id: {
+    id_table: {
         type: sequelize_1.DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
         allowNull: false
+    },
+    id: {
+        type: sequelize_1.DataTypes.INTEGER,
+        allowNull: true
     },
     site_id: {
         type: sequelize_1.DataTypes.INTEGER,

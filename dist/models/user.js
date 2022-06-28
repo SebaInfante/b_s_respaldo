@@ -22,10 +22,17 @@ const User = connectionResgisters_1.default.define("tdx_users", {
     employee: {
         type: sequelize_1.DataTypes.INTEGER,
     },
+    createdAt: {
+        type: sequelize_1.DataTypes.DATE,
+    },
+    updatedAt: {
+        type: sequelize_1.DataTypes.DATE,
+    },
     deleted_flag: {
         type: sequelize_1.DataTypes.BOOLEAN,
     },
-}, {
+}, { createdAt: false,
+    updatedAt: false,
     freezeTableName: true,
 });
 exports.default = User;

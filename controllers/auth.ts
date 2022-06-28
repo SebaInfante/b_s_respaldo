@@ -6,6 +6,7 @@ import jwt from "jsonwebtoken";
 import nodemailer from "nodemailer";
 
 import User from "../models/user";
+const { QueryTypes } = require("sequelize");
 
 // ************************************************************************************************************************
 // !                                                     LOGIN
@@ -16,22 +17,34 @@ export const login = async (req: Request, res: Response) => {
     //Confirmar email y status
 
     console.log(email);
+    console.log(password);
     
     const user = await User.findOne({ where: { email } });
+
+
+    // const user:any = await User.sequelize?.query(
+    //   `SELECT * FROM [tdx_users] WHERE email = '${email}' AND deleted_flag = 0`,
+    //   { type: QueryTypes.SELECT }
+    // ) || "";
+
+
     if (!user) {
-      return res.status(400).json({ msg: "Username or password do not match" });
+      return res.status(400).json({ msg: "E Username or password do not match" });
     }
 
-    //Confirmar eliminación
-    if (user.deleted_flag==1) {
-      return res.status(400).json({ msg: "Username or password do not match" });
-    }
 
-    //Confirmar password
-    const validPassword = await desencriptar(password, user.password);
-    if (!validPassword) {
-      return res.status(400).json({ msg: "Username or password do not match" });
-    }
+//Confirmar eliminación
+// if (user.deleted_flag==1) {
+//   return res.status(400).json({ msg: "P Username or password do not match" });
+// }
+// console.log('eliminacion');
+
+//Confirmar password
+const validPassword = await desencriptar(password, user.password);
+if (!validPassword) {
+  return res.status(400).json({ msg: "V Username or password do not match" });
+}
+console.log('valiacion');
 
     const token = await generarJWT(user.id);
 

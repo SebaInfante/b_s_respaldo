@@ -52,7 +52,7 @@ export const recordsToDay = async (req: Request, res: Response) => {
   const resource =
     (await Pass_Record.sequelize?.query(
       `
-                SELECT pass.id AS id, pass.create_time, egroup.name AS empresa,person.name, person.id_card,  data.resource_url ,pass.img_uri, pass.temperature, pass.temperature_state, pass.direction
+                SELECT TOP 500  pass.id AS id, pass.create_time, egroup.name AS empresa,person.name, person.id_card,  data.resource_url ,pass.img_uri, pass.temperature, pass.temperature_state, pass.direction
                 FROM (SELECT * FROM tdx_pass_record WHERE deleted_flag = 0) AS pass, 
                      (SELECT * FROM tdx_person WHERE deleted_flag = 0) AS person, 
                      (SELECT * FROM tdx_person_photo WHERE deleted_flag = 0) AS photo, 
@@ -73,7 +73,7 @@ export const recordsToDay = async (req: Request, res: Response) => {
                     person.id_card LIKE '%${rut}%') AND 
                     pass.create_time BETWEEN '${fechaAnterior}' AND '${fechaActual}'
                 ORDER BY pass.create_time DESC 
-                LIMIT 100
+
                 `,
       { type: QueryTypes.SELECT }
     )) || "";
@@ -81,7 +81,10 @@ export const recordsToDay = async (req: Request, res: Response) => {
 };
 
 export const downloadReportRecords = async (req: Request, res: Response) => {
-  const userAuth = req.body.userAuth;
+  console.log(req.body);
+  
+  try {
+    const userAuth = req.body.userAuth;
   const name = req.body.name || "";
   const rut = req.body.rut || "";
   const intervalo = req.body.intervalo || 1000;
@@ -113,12 +116,14 @@ export const downloadReportRecords = async (req: Request, res: Response) => {
   if  (req.body.role === "ADM" || req.body.role === "USM") {
     !contratista ? (egroupName = "") : (egroupName = contratista);
   } else {
+    console.log(userAuth);
+    
     egroupName = userAuth.name;
   }
 
   const resource = await Pass_Record.sequelize?.query(
         `
-                    SELECT pass.create_time, egroup.name AS empresa,person.name, person.id_card,  data.resource_url ,pass.img_uri, pass.temperature, pass.temperature_state, pass.direction
+                    SELECT TOP 10000 pass.create_time, egroup.name AS empresa,person.name, person.id_card,  data.resource_url ,pass.img_uri, pass.temperature, pass.temperature_state, pass.direction
                     FROM tdx_pass_record AS pass, tdx_person AS person, tdx_person_photo AS photo, tdx_resource_data AS data, tdx_employee_group AS egroup, tdx_employee AS employee
                     WHERE 
                         (pass.person_id = person.id AND
@@ -135,7 +140,7 @@ export const downloadReportRecords = async (req: Request, res: Response) => {
                         person.id_card LIKE '%${rut}%') AND 
                         pass.create_time BETWEEN '${fechaAnterior}' AND '${fechaActual}'
                     ORDER BY pass.create_time DESC 
-                    LIMIT 10000
+
                     `,
         { type: QueryTypes.SELECT }
     );
@@ -172,7 +177,7 @@ export const downloadReportRecords = async (req: Request, res: Response) => {
     });
 
     const Filename = `${uuid()}.xlsx`
-    const pathExcel = path.join(__dirname, "..", "excel", Filename);
+    const pathExcel = path.join(__dirname, "../..", "excel", Filename);
 
     await wb.write(pathExcel, function (err: any, stats: any) {
         if (err) {
@@ -188,21 +193,32 @@ export const downloadReportRecords = async (req: Request, res: Response) => {
         }
 
     });
+  } catch (error) {
+    console.log(error);
+    
+  }
 
 };
 
 export const downReport = async (req: Request, res: Response) => {
+  try {
     let filename = req.params.resource_url;
-    let url = path.join(__dirname, "..", "excel", filename);
-    res.status(200).download(url);};
+    let url = path.join(__dirname, "../..", "excel", filename);
+    res.status(200).download(url);
+  } catch (error) {
+    console.log(error);
+  }
+
+  };
   //*********************
 
 
 
   
 export const deleteRecord = async (req: Request, res: Response) => {
-console.log('0');
 
+  try {
+    
   const ID = req.params.id;
   const userAuth = req.body.userAuth;
   const fecha = new Date();
@@ -216,29 +232,34 @@ console.log('0');
         )) || "";
 
   return res.status(200).json({ DeleteRecord })
+  } catch (error) {
+    console.log(error);
+    
+  }
+
 }
 
 
 
 export const updateRecord = async (req: Request, res: Response) => {
-console.log('0');
-try {
-  const ID = req.params.id;
-  const userAuth = req.body.userAuth;
-  const fecha = new Date();
-  const today = `${fecha.getFullYear()}-${fecha.getMonth() + 1}-${fecha.getDate()} ${fecha.getHours()}:${fecha.getMinutes()}:${fecha.getSeconds()}`;
 
-    const DeleteRecord =
-          (await Pass_Record.sequelize?.query(
-            `
-                UPDATE tdx_pass_record SET person_id = '${req.body.person_id}', direction ='${req.body.turno}',update_time = '${today}', update_user = '${userAuth.name}' WHERE id = '${ID}'
-            `
-          )) || "";
+  try {
+    const ID = req.params.id;
+    const userAuth = req.body.userAuth;
+    const fecha = new Date();
+    const today = `${fecha.getFullYear()}-${fecha.getMonth() + 1}-${fecha.getDate()} ${fecha.getHours()}:${fecha.getMinutes()}:${fecha.getSeconds()}`;
 
-  return res.status(200).json({ DeleteRecord })
-} catch (error) {
-  console.log(error);
-  
-}
+      const DeleteRecord =
+            (await Pass_Record.sequelize?.query(
+              `
+                  UPDATE tdx_pass_record SET person_id = '${req.body.person_id}', direction ='${req.body.turno}',update_time = '${today}', update_user = '${userAuth.name}' WHERE id = '${ID}'
+              `
+            )) || "";
+
+    return res.status(200).json({ DeleteRecord })
+  } catch (error) {
+    console.log(error);
+    
+  }
 
 }

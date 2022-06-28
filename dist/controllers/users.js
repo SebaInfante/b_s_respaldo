@@ -59,14 +59,10 @@ const getUserEmpleadoPorMandanteYAdmin = (req, res) => __awaiter(void 0, void 0,
     const userAuth = req.body.userAuth;
     let users;
     if (userAuth.role === "USM") {
-        users = yield user_1.default.findAll({
-            where: { role: "USC", employee: userAuth.id },
-        });
+        users = yield user_1.default.findAll({ where: { role: "USC", employee: userAuth.id }, });
     }
     else {
-        users = yield user_1.default.findAll({
-            where: { role: "USC" },
-        });
+        users = yield user_1.default.findAll({ where: { role: "USC" }, });
     }
     res.json(users);
 });
@@ -115,21 +111,25 @@ const createUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         const user = user_1.default.build(newUser); //Cargo el nuevo usuario
         yield user.save(); //Envío el usuario a la BD
         if (role === 'USC') {
-            const x = yield Employee_Group_1.default.count();
-            const rgt = (x + 1) * 2;
-            const lft = rgt - 1;
-            const sort_num = x + 1;
-            const newEmployeeGroup = {
-                site_id: 1,
-                name,
-                parent_id: 0,
-                sort_num,
-                lft,
-                rgt,
-                create_user: 'system'
-            };
-            const employee_group = Employee_Group_1.default.build(newEmployeeGroup); //Cargo el nuevo usuario
-            yield employee_group.save(); //Envío el usuario a la BD
+            const existsUSC = yield Employee_Group_1.default.findOne({ where: { name } }); //Buscar si existe un email
+            if (!existsUSC) {
+                const x = yield Employee_Group_1.default.count();
+                const rgt = (x + 1) * 2;
+                const lft = rgt - 1;
+                const sort_num = x + 1;
+                const newEmployeeGroup = {
+                    id: x,
+                    site_id: 1,
+                    name,
+                    parent_id: 0,
+                    sort_num,
+                    lft,
+                    rgt,
+                    create_user: 'system'
+                };
+                const employee_group = Employee_Group_1.default.build(newEmployeeGroup); //Cargo el nuevo usuario
+                yield employee_group.save(); //Envío el usuario a la BD
+            }
         }
         res.json(user);
     }

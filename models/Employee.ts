@@ -4,11 +4,15 @@ import dbREG from "../db/connectionResgisters";
 const Employee = dbREG.define<any>(
     "tdx_employee",
     {
-        id: {
+        id_table: {
             type: DataTypes.INTEGER,
             primaryKey: true,
             autoIncrement:true,
             allowNull:false
+        },
+        id: {
+            type: DataTypes.INTEGER,
+            allowNull:true
         },
         site_id: {
             type: DataTypes.INTEGER,

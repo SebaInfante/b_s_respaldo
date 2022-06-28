@@ -18,6 +18,7 @@ const jsonwebtoken_1 = require("../lib/jsonwebtoken");
 const jsonwebtoken_2 = __importDefault(require("jsonwebtoken"));
 const nodemailer_1 = __importDefault(require("nodemailer"));
 const user_1 = __importDefault(require("../models/user"));
+const { QueryTypes } = require("sequelize");
 // ************************************************************************************************************************
 // !                                                     LOGIN
 // ************************************************************************************************************************
@@ -26,19 +27,26 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         //Confirmar email y status
         console.log(email);
+        console.log(password);
         const user = yield user_1.default.findOne({ where: { email } });
+        // const user:any = await User.sequelize?.query(
+        //   `SELECT * FROM [tdx_users] WHERE email = '${email}' AND deleted_flag = 0`,
+        //   { type: QueryTypes.SELECT }
+        // ) || "";
         if (!user) {
-            return res.status(400).json({ msg: "Username or password do not match" });
+            return res.status(400).json({ msg: "E Username or password do not match" });
         }
         //Confirmar eliminación
-        if (user.deleted_flag == 1) {
-            return res.status(400).json({ msg: "Username or password do not match" });
-        }
+        // if (user.deleted_flag==1) {
+        //   return res.status(400).json({ msg: "P Username or password do not match" });
+        // }
+        // console.log('eliminacion');
         //Confirmar password
         const validPassword = yield (0, bcrypt_1.desencriptar)(password, user.password);
         if (!validPassword) {
-            return res.status(400).json({ msg: "Username or password do not match" });
+            return res.status(400).json({ msg: "V Username or password do not match" });
         }
+        console.log('valiacion');
         const token = yield (0, jsonwebtoken_1.generarJWT)(user.id);
         res.json({ user, token });
     }

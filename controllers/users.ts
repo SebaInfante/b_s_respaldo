@@ -49,13 +49,9 @@ export const getUserEmpleadoPorMandanteYAdmin = async (
   const userAuth = req.body.userAuth;
   let users;
   if (userAuth.role === "USM") {
-    users = await User.findAll({
-      where: { role: "USC", employee: userAuth.id },
-    });
+    users = await User.findAll({where: { role: "USC", employee: userAuth.id },});
   } else {
-    users = await User.findAll({
-      where: { role: "USC" },
-    });
+    users = await User.findAll({where: { role: "USC" },});
   }
 
   res.json(users);
@@ -107,12 +103,15 @@ export const createUser = async (req: Request, res: Response) => {
     await user.save(); //Envío el usuario a la BD
 
     if(role ==='USC'){
+      const existsUSC = await Employee_Group.findOne({ where: { name } }); //Buscar si existe un email
+      if(!existsUSC){
       const x = await Employee_Group.count();
       const rgt = (x+1)*2
       const lft = rgt-1
       const sort_num = x+1
 
       const newEmployeeGroup={
+        id: x,
         site_id:1,
         name,
         parent_id:0,
@@ -121,8 +120,11 @@ export const createUser = async (req: Request, res: Response) => {
         rgt,
         create_user: 'system'
       }
-      const employee_group = Employee_Group.build(newEmployeeGroup); //Cargo el nuevo usuario
-      await employee_group.save(); //Envío el usuario a la BD
+
+
+        const employee_group = Employee_Group.build(newEmployeeGroup); //Cargo el nuevo usuario
+        await employee_group.save(); //Envío el usuario a la BD
+      }
     }
     res.json(user);
   } catch (error) {

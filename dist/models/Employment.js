@@ -5,7 +5,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const sequelize_1 = require("sequelize");
 const connectionResgisters_1 = __importDefault(require("../db/connectionResgisters"));
-//Colcar las columnas de la bd que se actualizan en este caso el id no va porque es autoincrementable
 const Employment = connectionResgisters_1.default.define("tdx_employment", {
     id: {
         type: sequelize_1.DataTypes.INTEGER,
@@ -24,10 +23,17 @@ const Employment = connectionResgisters_1.default.define("tdx_employment", {
     employment: {
         type: sequelize_1.DataTypes.STRING,
     },
+    createdAt: {
+        type: sequelize_1.DataTypes.DATE,
+    },
+    updatedAt: {
+        type: sequelize_1.DataTypes.DATE,
+    },
     deleted_flag: {
         type: sequelize_1.DataTypes.BOOLEAN,
     },
-}, {
+}, { createdAt: false,
+    updatedAt: false,
     freezeTableName: true,
 });
 exports.default = Employment;
